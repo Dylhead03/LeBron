@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Player Guessing Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Styles (same as before) */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .correct { background-color: #10b981; color: white; } /* emerald-500 */
+        .incorrect { background-color: #ef4444; color: white; opacity: 0.7; } /* red-500 */
+        .partial { background-color: #f59e0b; color: white; } /* amber-500 */
+        .hint-arrow { font-weight: bold; margin-left: 4px; }
+        .guess-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border: 1px solid #4b5563; /* gray-600 */
+            min-height: 50px;
+            text-align: center;
+            word-break: break-word;
+        }
+        #player-guess-input {
+            padding: 0.75rem;
+            border: 1px solid #4b5563; /* gray-600 */
+            border-radius: 0.375rem; /* rounded-md */
+            background-color: #374151; /* gray-700 */
+            color: white;
+            margin-right: 0.5rem;
+        }
+        datalist { font-family: sans-serif; }
+    </style>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-gray-200 p-5">
+
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-2 text-center text-blue-400">NBA Player Guessing Game</h1>
+        <p class="text-xs text-center text-gray-500 mb-4">Guess from a large list of active NBA players!</p> <div class="flex justify-center mb-6">
+            <input type="text" id="player-guess-input" list="player-suggestions" placeholder="Enter player name..." class="w-full max-w-md">
+            <datalist id="player-suggestions"></datalist>
+            <button id="guess-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md transition duration-200">Guess</button>
+        </div>
+
+        <div id="message-area" class="text-center mb-4 h-6 text-gray-400">
+            </div>
+
+        <div class="grid grid-cols-7 gap-1 mb-2 text-sm font-semibold text-center text-gray-400">
+            <div>Name</div>
+            <div>Team</div>
+            <div>Conf.</div>
+            <div>Height</div>
+            <div>Age</div>
+            <div>Number</div>
+            <div>Correct?</div>
+        </div>
+
+        <div id="guesses-container" class="space-y-1">
+            </div>
+
+         <div class="text-center mt-6">
+            <button id="play-again-button" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md transition duration-200">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Player Data ---
+        // NOTE: This is a significantly EXPANDED list, but may not be 100% comprehensive or up-to-the-minute accurate.
+        // Data like teams, numbers, and active status can change frequently. Ages calculated from birthdate.
+        const players = [
+            // Stars & Key Players (Examples from previous list + additions)
+            { name: "LeBron James", team: "Los Angeles Lakers", conference: "West", height_feet: 6, height_inches: 9, birthdate: "1984-12-30", number: 23 },
+            { name: "Stephen Curry", team: "Golden State Warriors", conference: "West", height_feet: 6, height_inches: 2, birthdate: "1988-03-14", number: 30 },
+            { name: "Kevin Durant", team: "Phoenix Suns", conference: "West", height_feet: 6, height_inches: 11, birthdate: "1988-09-29", number: 35 },
+            { name: "Giannis Antetokounmpo", team: "Milwaukee Bucks", conference: "East", height_feet: 6, height_inches: 11, birthdate: "1994-12-06", number: 34 },
+            { name: "Nikola Jokic", team: "Denver Nuggets", conference: "West", height_feet: 6, height_inches: 11, birthdate: "1995-02-19", number: 15 },
+            { name: "Luka Doncic", team: "Dallas Mavericks", conference: "West", height_feet: 6, height_inches: 7, birthdate: "1999-02-28", number: 77 },
+            { name: "Joel Embiid", team: "Philadelphia 76ers", conference: "East", height_feet: 7, height_inches: 0, birthdate: "1994-03-16", number: 21 },
+            { name: "Jayson Tatum", team: "Boston Celtics", conference: "East", height_feet: 6, height_inches: 8, birthdate: "1998-03-03", number: 0 },
+            { name: "Devin Booker", team: "Phoenix Suns", conference: "West", height_feet: 6, height_inches: 5, birthdate: "1996-10-30", number: 1 },
+            { name: "Anthony Edwards", team: "Minnesota Timberwolves", conference: "West", height_feet: 6, height_inches: 4, birthdate: "2001-08-05", number: 5 },
+            { name: "Victor Wembanyama", team: "San Antonio Spurs", conference: "West", height_feet: 7, height_inches: 4, birthdate: "2004-01-04", number: 1 },
+            { name: "Shai Gilgeous-Alexander", team: "Oklahoma City Thunder", conference: "West", height_feet: 6, height_inches: 6, birthdate: "1998-07-12", number: 2 },
+            { name: "Damian Lillard", team: "Milwaukee Bucks", conference: "East", height_feet: 6, height_inches: 2, birthdate: "1990-07-15", number: 0 },
+            { name: "Jimmy Butler", team: "Miami Heat", conference: "East", height_feet: 6, height_inches: 7, birthdate: "1989-09-14", number: 22 },
+            { name: "Kawhi Leonard", team: "LA Clippers", conference: "West", height_feet: 6, height_inches: 7, birthdate: "1991-06-29", number: 2 },
+            { name: "Jaylen Brown", team: "Boston Celtics", conference: "East", height_feet: 6, height_inches: 6, birthdate: "1996-10-24", number: 7 },
+            { name: "Tyrese Haliburton", team: "Indiana Pacers", conference: "East", height_feet: 6, height_inches: 5, birthdate: "2000-02-29", number: 0 },
+            { name: "Zion Williamson", team: "New Orleans Pelicans", conference: "West", height_feet: 6, height_inches: 6, birthdate: "2000-07-06", number: 1 },
+            { name: "Ja Morant", team: "Memphis Grizzlies", conference: "West", height_feet: 6, height_inches: 2, birthdate: "1999-08-10", number: 12 },
+            { name: "Trae Young", team: "Atlanta Hawks", conference: "East", height_feet: 6, height_inches: 1, birthdate: "1998-09-19", number: 11 },
+            { name: "Donovan Mitchell", team: "Cleveland Cavaliers", conference: "East", height_feet: 6, height_inches: 3, birthdate: "1996-09-07", number: 45 },
+            { name: "Anthony Davis", team: "Los Angeles Lakers", conference: "West", height_feet: 6, height_inches: 10, birthdate: "1993-03-11", number: 3 },
+            { name: "Paul George", team: "LA Clippers", conference: "West", height_feet: 6, height_inches: 8, birthdate: "1990-05-02", number: 13 },
+            { name: "Kyrie Irving", team: "Dallas Mavericks", conference: "West", height_feet: 6, height_inches: 2, birthdate: "1992-03-23", number: 11 },
+            { name: "James Harden", team: "LA Clippers", conference: "West", height_feet: 6, height_inches: 5, birthdate: "1989-08-26", number: 1 },
+            { name: "Bam Adebayo", team: "Miami Heat", conference: "East", height_feet: 6, height_inches: 9, birthdate: "1997-07-18", number: 13 },
+            { name: "De'Aaron Fox", team: "Sacramento Kings", conference: "West", height_feet: 6, height_inches: 3, birthdate: "1997-12-20", number: 5 },
+            { name: "Domantas Sabonis", team: "Sacramento Kings", conference: "West", height_feet: 6, height_inches: 10, birthdate: "1996-05-03", number: 10 },
+            { name: "Pascal Siakam", team: "Indiana Pacers", conference: "East", height_feet: 6, height_inches: 8, birthdate: "1994-04-02", number: 43 },
+            { name: "Jalen Brunson", team: "New York Knicks", conference: "East", height_feet: 6, height_inches: 2, birthdate: "1996-08-31", number: 11 },
+            { name: "Karl-Anthony Towns", team: "Minnesota Timberwolves", conference: "West", height_feet: 7, height_inches: 0, birthdate: "1995-11-15", number: 32 },
+            { name: "LaMelo Ball", team: "Charlotte Hornets", conference: "East", height_feet: 6, height_inches: 7, birthdate: "2001-08-22", number: 1 },
+            { name: "Brandon Ingram", team: "New Orleans Pelicans", conference: "West", height_feet: 6, height_inches: 8, birthdate: "1997-09-02", number: 14 },
+            { name: "Jamal Murray", team: "Denver Nuggets", conference: "West", height_feet: 6, height_inches: 3, birthdate: "1997-02-23", number: 27 },
+            { name: "Kristaps Porzingis", team: "Boston Celtics", conference: "East", height_feet: 7, height_inches: 2, birthdate: "1995-08-02", number: 8 },
+            { name: "Chet Holmgren", team: "Oklahoma City Thunder", conference: "West", height_feet: 7, height_inches: 1, birthdate: "2002-05-01", number: 7 },
+            { name: "Paolo Banchero", team: "Orlando Magic", conference: "East", height_feet: 6, height_inches: 10, birthdate: "2002-11-12", number: 5 },
+            { name: "Scottie Barnes", team: "Toronto Raptors", conference: "East", height_feet: 6, height_inches: 7, birthdate: "2001-08-01", number: 4 },
+            { name: "Cade Cunningham", team: "Detroit Pistons", conference: "East", height_feet: 6, height_inches: 6, birthdate: "2001-09-25", number: 2 },
+            { name: "Jalen Green", team: "Houston Rockets", conference: "West", height_feet: 6, height_inches: 4, birthdate: "2002-02-09", number: 4 },
+
+            // More Role Players / Other Starters (Examples)
+            { name: "Draymond Green", team: "Golden State Warriors", conference: "West", height_feet: 6, height_inches: 6, birthdate: "1990-03-04", number: 23 },
+            { name: "Klay Thompson", team: "Golden State Warriors", conference: "West", height_feet: 6, height_inches: 6, birthdate: "1990-02-08", number: 11 },
+            { name: "Chris Paul", team: "Golden State Warriors", conference: "West", height_feet: 6, height_inches: 0, birthdate: "1985-05-06", number: 3 },
+            { name: "Rudy Gobert", team: "Minnesota Timberwolves", conference: "West", height_feet: 7, height_inches: 1, birthdate: "1992-06-26", number: 27 },
+            { name: "Jrue Holiday", team: "Boston Celtics", conference: "East", height_feet: 6, height_inches: 4, birthdate: "1990-06-12", number: 4 },
+            { name: "Derrick White", team: "Boston Celtics", conference: "East", height_feet: 6, height_inches: 4, birthdate: "1994-07-02", number: 9 },
+            { name: "Myles Turner", team: "Indiana Pacers", conference: "East", height_feet: 6, height_inches: 11, birthdate: "1996-03-24", number: 33 },
+            { name: "Fred VanVleet", team: "Houston Rockets", conference: "West", height_feet: 6, height_inches: 1, birthdate: "1994-02-25", number: 5 },
+            { name: "Alperen Sengun", team: "Houston Rockets", conference: "West", height_feet: 6, height_inches: 11, birthdate: "2002-07-25", number: 28 },
+            { name: "Mikal Bridges", team: "Brooklyn Nets", conference: "East", height_feet: 6, height_inches: 6, birthdate: "1996-08-30", number: 1 },
+            { name: "Nic Claxton", team: "Brooklyn Nets", conference: "East", height_feet: 6, height_inches: 11, birthdate: "1999-04-17", number: 33 },
+            { name: "Julius Randle", team: "New York Knicks", conference: "East", height_feet: 6, height_inches: 8, birthdate: "1994-11-29", number: 30 },
+            { name: "OG Anunoby", team: "New York Knicks", conference: "East", height_feet: 6, height_inches: 7, birthdate: "1997-07-17", number: 8 },
+            { name: "Franz Wagner", team: "Orlando Magic", conference: "East", height_feet: 6, height_inches: 10, birthdate: "2001-08-27", number: 22 },
+            { name: "Jalen Suggs", team: "Orlando Magic", conference: "East", height_feet: 6, height_inches: 5, birthdate: "2001-06-03", number: 4 },
+            { name: "Tyrese Maxey", team: "Philadelphia 76ers", conference: "East", height_feet: 6, height_inches: 2, birthdate: "2000-11-04", number: 0 },
+            { name: "Tobias Harris", team: "Philadelphia 76ers", conference: "East", height_feet: 6, height_inches: 7, birthdate: "1992-07-15", number: 12 },
+            { name: "Bradley Beal", team: "Phoenix Suns", conference: "West", height_feet: 6, height_inches: 4, birthdate: "1993-06-28", number: 3 },
+            { name: "Anfernee Simons", team: "Portland Trail Blazers", conference: "West", height_feet: 6, height_inches: 3, birthdate: "1999-06-08", number: 1 },
+            { name: "Deandre Ayton", team: "Portland Trail Blazers", conference: "West", height_feet: 7, height_inches: 0, birthdate: "1998-07-23", number: 2 },
+            { name: "Keegan Murray", team: "Sacramento Kings", conference: "West", height_feet: 6, height_inches: 8, birthdate: "2000-08-19", number: 13 },
+            { name: "Malik Monk", team: "Sacramento Kings", conference: "West", height_feet: 6, height_inches: 3, birthdate: "1998-02-04", number: 0 },
+            { name: "Keldon Johnson", team: "San Antonio Spurs", conference: "West", height_feet: 6, height_inches: 5, birthdate: "1999-10-11", number: 3 },
+            { name: "Devin Vassell", team: "San Antonio Spurs", conference: "West", height_feet: 6, height_inches: 5, birthdate: "2000-08-23", number: 24 },
+            { name: "RJ Barrett", team: "Toronto Raptors", conference: "East", height_feet: 6, height_inches: 6, birthdate: "2000-06-14", number: 9 },
+            { name: "Immanuel Quickley", team: "Toronto Raptors", conference: "East", height_feet: 6, height_inches: 2, birthdate: "1999-06-17", number: 5 },
+            { name: "Lauri Markkanen", team: "Utah Jazz", conference: "West", height_feet: 7, height_inches: 0, birthdate: "1997-05-22", number: 23 },
+            { name: "Collin Sexton", team: "Utah Jazz", conference: "West", height_feet: 6, height_inches: 3, birthdate: "1999-01-04", number: 2 },
+            { name: "Jordan Poole", team: "Washington Wizards", conference: "East", height_feet: 6, height_inches: 4, birthdate: "1999-06-19", number: 13 },
+            { name: "Kyle Kuzma", team: "Washington Wizards", conference: "East", height_feet: 6, height_inches: 9, birthdate: "1995-07-24", number: 33 },
+            { name: "Dejounte Murray", team: "Atlanta Hawks", conference: "East", height_feet: 6, height_inches: 5, birthdate: "1996-09-19", number: 5 },
+            { name: "Clint Capela", team: "Atlanta Hawks", conference: "East", height_feet: 6, height_inches: 10, birthdate: "1994-05-18", number: 15 },
+            { name: "Miles Bridges", team: "Charlotte Hornets", conference: "East", height_feet: 6, height_inches: 7, birthdate: "1998-03-21", number: 0 },
+            { name: "Brandon Miller", team: "Charlotte Hornets", conference: "East", height_feet: 6, height_inches: 7, birthdate: "2002-11-22", number: 24 },
+            { name: "Zach LaVine", team: "Chicago Bulls", conference: "East", height_feet: 6, height_inches: 5, birthdate: "1995-03-10", number: 8 },
+            { name: "DeMar DeRozan", team: "Chicago Bulls", conference: "East", height_feet: 6, height_inches: 6, birthdate: "1989-08-07", number: 11 },
+            { name: "Nikola Vucevic", team: "Chicago Bulls", conference: "East", height_feet: 6, height_inches: 10, birthdate: "1990-10-24", number: 9 },
+            { name: "Jarrett Allen", team: "Cleveland Cavaliers", conference: "East", height_feet: 6, height_inches: 9, birthdate: "1998-04-21", number: 31 },
+            { name: "Darius Garland", team: "Cleveland Cavaliers", conference: "East", height_feet: 6, height_inches: 1, birthdate: "2000-01-26", number: 10 },
+            { name: "Evan Mobley", team: "Cleveland Cavaliers", conference: "East", height_feet: 6, height_inches: 11, birthdate: "2001-06-18", number: 4 },
+            { name: "Michael Porter Jr.", team: "Denver Nuggets", conference: "West", height_feet: 6, height_inches: 10, birthdate: "1998-06-29", number: 1 },
+            { name: "Aaron Gordon", team: "Denver Nuggets", conference: "West", height_feet: 6, height_inches: 8, birthdate: "1995-09-16", number: 50 },
+            { name: "Jaden Ivey", team: "Detroit Pistons", conference: "East", height_feet: 6, height_inches: 4, birthdate: "2002-02-13", number: 23 },
+            { name: "Jalen Duren", team: "Detroit Pistons", conference: "East", height_feet: 6, height_inches: 10, birthdate: "2003-11-18", number: 0 },
+            { name: "Andrew Wiggins", team: "Golden State Warriors", conference: "West", height_feet: 6, height_inches: 7, birthdate: "1995-02-23", number: 22 },
+            { name: "Jabari Smith Jr.", team: "Houston Rockets", conference: "West", height_feet: 6, height_inches: 11, birthdate: "2003-05-13", number: 10 },
+            { name: "Bennedict Mathurin", team: "Indiana Pacers", conference: "East", height_feet: 6, height_inches: 5, birthdate: "2002-06-19", number: 0 },
+            { name: "Russell Westbrook", team: "LA Clippers", conference: "West", height_feet: 6, height_inches: 3, birthdate: "1988-11-12", number: 0 },
+            { name: "Austin Reaves", team: "Los Angeles Lakers", conference: "West", height_feet: 6, height_inches: 5, birthdate: "1998-05-29", number: 15 },
+            { name: "Jaren Jackson Jr.", team: "Memphis Grizzlies", conference: "West", height_feet: 6, height_inches: 10, birthdate: "1999-09-15", number: 13 },
+            { name: "Desmond Bane", team: "Memphis Grizzlies", conference: "West", height_feet: 6, height_inches: 5, birthdate: "1998-06-25", number: 22 },
+            { name: "Tyler Herro", team: "Miami Heat", conference: "East", height_feet: 6, height_inches: 5, birthdate: "2000-01-20", number: 14 },
+            { name: "Khris Middleton", team: "Milwaukee Bucks", conference: "East", height_feet: 6, height_inches: 7, birthdate: "1991-08-12", number: 22 },
+            { name: "Brook Lopez", team: "Milwaukee Bucks", conference: "East", height_feet: 7, height_inches: 1, birthdate: "1988-04-01", number: 11 },
+            { name: "Mike Conley", team: "Minnesota Timberwolves", conference: "West", height_feet: 6, height_inches: 0, birthdate: "1987-10-11", number: 10 },
+            { name: "CJ McCollum", team: "New Orleans Pelicans", conference: "West", height_feet: 6, height_inches: 3, birthdate: "1991-09-19", number: 3 },
+            { name: "Josh Hart", team: "New York Knicks", conference: "East", height_feet: 6, height_inches: 4, birthdate: "1995-03-06", number: 3 },
+            { name: "Jalen Williams", team: "Oklahoma City Thunder", conference: "West", height_feet: 6, height_inches: 5, birthdate: "2001-04-14", number: 8 },
+            { name: "Josh Giddey", team: "Oklahoma City Thunder", conference: "West", height_feet: 6, height_inches: 8, birthdate: "2002-10-10", number: 3 },
+            // Add more players as needed following the same structure
+        ];
+
+
+        // --- DOM Elements ---
+        const guessInput = document.getElementById('player-guess-input');
+        const guessButton = document.getElementById('guess-button');
+        const guessesContainer = document.getElementById('guesses-container');
+        const messageArea = document.getElementById('message-area');
+        const playAgainButton = document.getElementById('play-again-button');
+        const playerSuggestionsDatalist = document.getElementById('player-suggestions');
+
+        // --- Game State ---
+        let secretPlayer = null;
+        let remainingGuesses = 8; // Keep the guess limit
+        let gameOver = false;
+
+        // --- Functions ---
+
+        /** Calculates age based on birthdate string (YYYY-MM-DD). */
+        function calculateAge(birthdateString) {
+            if (!birthdateString) return '?';
+            try {
+                const birthDate = new Date(birthdateString);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                return age;
+            } catch (e) {
+                console.error("Error parsing birthdate:", birthdateString, e);
+                return '?';
+            }
+        }
+
+        /** Converts height in feet and inches to total inches. */
+        function getTotalInches(feet, inches) {
+             // Handle cases where height might be missing/null
+             if (typeof feet !== 'number' || typeof inches !== 'number') return null;
+            return (feet * 12) + inches;
+        }
+
+        /** Formats height for display (e.g., 6' 9"). */
+        function formatHeight(feet, inches) {
+             if (typeof feet !== 'number' || typeof inches !== 'number') return '?';
+            return `${feet}' ${inches}"`;
+        }
+
+        /** Populates the datalist for autocomplete suggestions. */
+        function populateDatalist() {
+            playerSuggestionsDatalist.innerHTML = ''; // Clear existing options
+            // Sort players alphabetically for the datalist
+            const sortedPlayers = [...players].sort((a, b) => a.name.localeCompare(b.name));
+            sortedPlayers.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player.name;
+                playerSuggestionsDatalist.appendChild(option);
+            });
+        }
+
+        /** Initializes a new game. */
+        function initializeGame() {
+            secretPlayer = players[Math.floor(Math.random() * players.length)];
+            console.log("Secret Player:", secretPlayer.name); // Debugging
+
+            remainingGuesses = 8;
+            gameOver = false;
+
+            guessesContainer.innerHTML = '';
+            messageArea.textContent = `Guess the player! ${remainingGuesses} guesses remaining.`;
+            messageArea.className = 'text-center mb-4 h-6 text-gray-400'; // Reset style
+            guessInput.value = '';
+            guessInput.disabled = false;
+            guessButton.disabled = false;
+            playAgainButton.classList.add('hidden');
+
+            populateDatalist();
+            guessInput.focus();
+        }
+
+        /** Displays a message to the user. */
+        function showMessage(msg, isError = false) {
+            messageArea.textContent = msg;
+            messageArea.className = `text-center mb-4 h-6 ${isError ? 'text-red-400' : 'text-green-400'}`;
+             if (isError) {
+                 setTimeout(() => {
+                    if (!gameOver && messageArea.textContent === msg) {
+                         messageArea.textContent = `Guess the player! ${remainingGuesses} guesses remaining.`;
+                         messageArea.className = 'text-center mb-4 h-6 text-gray-400';
+                    }
+                 }, 3000);
+             }
+        }
+
+       /** Creates a comparison cell for the guess grid. */
+        function createComparisonCell(value, correctness, hint = '') {
+            const cell = document.createElement('div');
+            cell.classList.add('guess-cell');
+            // Ensure correctness is one of the expected classes
+            if (['correct', 'incorrect', 'partial'].includes(correctness)) {
+                 cell.classList.add(correctness);
+            } else {
+                 // Default or fallback style if needed
+                 cell.classList.add('bg-gray-700'); // Example default
+            }
+
+            cell.textContent = value === null || value === undefined ? '?' : value; // Display '?' for null/undefined values
+            if (hint) {
+                const hintSpan = document.createElement('span');
+                hintSpan.classList.add('hint-arrow');
+                hintSpan.textContent = hint;
+                cell.appendChild(hintSpan);
+            }
+            return cell;
+        }
+
+
+        /** Handles the user's guess. */
+        function handleGuess() {
+            if (gameOver) return;
+
+            const guessName = guessInput.value.trim();
+            if (!guessName) {
+                showMessage("Please enter a player's name.", true);
+                return;
+            }
+
+            const guessedPlayer = players.find(p => p.name.toLowerCase() === guessName.toLowerCase());
+
+            if (!guessedPlayer) {
+                showMessage(`Player "${guessName}" not found in the list. Try again.`, true);
+                guessInput.value = '';
+                return;
+            }
+
+            remainingGuesses--;
+
+            // --- Compare Attributes ---
+            const secretAge = calculateAge(secretPlayer.birthdate);
+            const guessedAge = calculateAge(guessedPlayer.birthdate);
+            const secretHeightInches = getTotalInches(secretPlayer.height_feet, secretPlayer.height_inches);
+            const guessedHeightInches = getTotalInches(guessedPlayer.height_feet, guessedPlayer.height_inches);
+            const secretNum = secretPlayer.number ?? null; // Use null for unknown/missing numbers
+            const guessedNum = guessedPlayer.number ?? null;
+
+            const isCorrectPlayer = guessedPlayer.name === secretPlayer.name;
+
+            const guessRow = document.createElement('div');
+            guessRow.classList.add('grid', 'grid-cols-7', 'gap-1', 'text-sm');
+
+            // 1. Name
+            guessRow.appendChild(createComparisonCell(guessedPlayer.name, isCorrectPlayer ? 'correct' : 'incorrect'));
+
+            // 2. Team
+            const teamCorrect = guessedPlayer.team === secretPlayer.team;
+            guessRow.appendChild(createComparisonCell(guessedPlayer.team, teamCorrect ? 'correct' : 'incorrect'));
+
+            // 3. Conference
+            const confCorrect = guessedPlayer.conference === secretPlayer.conference;
+            guessRow.appendChild(createComparisonCell(guessedPlayer.conference, confCorrect ? 'correct' : 'incorrect'));
+
+            // 4. Height
+            let heightCorrectness = 'incorrect';
+            let heightHint = '';
+            if (guessedHeightInches === null || secretHeightInches === null) {
+                 heightCorrectness = 'incorrect'; // Cannot compare if height is unknown
+            } else if (guessedHeightInches === secretHeightInches) {
+                heightCorrectness = 'correct';
+            } else {
+                heightHint = guessedHeightInches < secretHeightInches ? '↑' : '↓';
+            }
+            guessRow.appendChild(createComparisonCell(formatHeight(guessedPlayer.height_feet, guessedPlayer.height_inches), heightCorrectness, heightHint));
+
+            // 5. Age
+            let ageCorrectness = 'incorrect';
+            let ageHint = '';
+             if (guessedAge === '?' || secretAge === '?') {
+                 ageCorrectness = 'incorrect'; // Cannot compare if age is unknown
+             } else if (guessedAge === secretAge) {
+                ageCorrectness = 'correct';
+            } else {
+                ageHint = guessedAge < secretAge ? '↑' : '↓';
+            }
+            guessRow.appendChild(createComparisonCell(guessedAge, ageCorrectness, ageHint));
+
+            // 6. Number
+            let numCorrectness = 'incorrect';
+            let numHint = '';
+            if (guessedNum === null || secretNum === null) {
+                 numCorrectness = 'incorrect'; // Cannot compare if number is unknown
+            } else if (guessedNum === secretNum) {
+                numCorrectness = 'correct';
+            } else {
+                numHint = guessedNum < secretNum ? '↑' : '↓';
+            }
+            guessRow.appendChild(createComparisonCell(guessedNum ?? '?', numCorrectness, numHint)); // Display '?' if null
+
+             // 7. Correctness Cell
+             guessRow.appendChild(createComparisonCell(isCorrectPlayer ? 'Yes!' : 'No', isCorrectPlayer ? 'correct' : 'incorrect'));
+
+            guessesContainer.prepend(guessRow);
+            guessInput.value = '';
+
+            // --- Check Game Over Conditions ---
+            if (isCorrectPlayer) {
+                showMessage(`Correct! You guessed ${secretPlayer.name}!`, false);
+                gameOver = true;
+            } else if (remainingGuesses <= 0) {
+                showMessage(`Out of guesses! The player was ${secretPlayer.name}.`, true);
+                gameOver = true;
+            } else {
+                 messageArea.textContent = `Guess the player! ${remainingGuesses} guesses remaining.`;
+                 messageArea.className = 'text-center mb-4 h-6 text-gray-400';
+            }
+
+            if (gameOver) {
+                guessInput.disabled = true;
+                guessButton.disabled = true;
+                playAgainButton.classList.remove('hidden');
+            } else {
+                 guessInput.focus();
+            }
+        }
+
+        // --- Event Listeners ---
+        guessButton.addEventListener('click', handleGuess);
+        guessInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                handleGuess();
+            }
+        });
+        playAgainButton.addEventListener('click', initializeGame);
+
+        // --- Initial Game Setup ---
+        document.addEventListener('DOMContentLoaded', initializeGame);
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleveland Cavaliers Fan Page</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* styles.css - Custom stylesheet for the Cavaliers Fan Page */
+
+        /* 1. Body Styling: Custom background and default font */
+        body {
+          background-color: #f0f4f8; /* Light blue-grey background */
+          font-family: 'Roboto', sans-serif; /* Apply Google Font */
+          color: #333; /* Default text color */
+          margin: 0;
+          padding: 0;
+          line-height: 1.6;
+        }
+
+        /* 2. Container Div Styling: Center content, add padding */
+        .container {
+          max-width: 960px; /* Limit content width */
+          margin: 20px auto; /* Center the container horizontally */
+          padding: 20px;
+          background-color: #ffffff; /* White background for content */
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
+          border-radius: 8px; /* Rounded corners */
+        }
+
+        /* 3. Header Div Styling: Title appearance */
+        .header {
+          background-color: #6F263D; /* Cavaliers Wine color */
+          color: #FECD34; /* Cavaliers Gold color */
+          padding: 20px;
+          text-align: center;
+          border-radius: 8px 8px 0 0; /* Rounded top corners */
+        }
+
+        .header h1 {
+          margin: 0;
+          font-size: 2.5em; /* Larger font size for main title */
+        }
+
+        /* 4. Navigation Div Styling */
+        .navigation {
+          padding: 10px 20px;
+          background-color: #e9ecef; /* Light grey background for nav */
+          text-align: center;
+          border-bottom: 1px solid #dee2e6; /* Separator line */
+        }
+
+        .navigation a {
+          color: #0056b3; /* Standard link blue */
+          text-decoration: none; /* Remove underline */
+          margin: 0 10px;
+        }
+
+        .navigation a:hover {
+          text-decoration: underline; /* Underline on hover */
+        }
+
+        /* 5. Content Div Styling */
+        .content {
+          padding: 20px;
+        }
+
+        .content h2, .content h3 {
+          color: #6F263D; /* Wine color for headings */
+          border-bottom: 2px solid #FECD34; /* Gold underline for headings */
+          padding-bottom: 5px;
+          margin-top: 30px;
+        }
+
+        /* 6. Image Styling */
+        .main-image {
+          max-width: 100%; /* Make image responsive */
+          height: auto;
+          display: block; /* Center image */
+          margin: 20px auto; /* Add space around image */
+          border-radius: 8px; /* Rounded corners for image */
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 7. List Styling */
+        ol, ul {
+          margin-left: 20px; /* Indent lists */
+          padding-left: 20px;
+        }
+
+        li {
+          margin-bottom: 10px; /* Space between list items */
+        }
+
+        /* 8. Video Container Styling */
+        .video-container {
+          position: relative;
+          padding-bottom: 56.25%; /* 16:9 aspect ratio */
+          height: 0;
+          overflow: hidden;
+          max-width: 100%;
+          background: #000;
+          margin: 20px 0;
+          border-radius: 8px; /* Rounded corners for video container */
+        }
+
+        .video-container iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+
+        /* 9. Tableau Placeholder Styling (Basic) */
+        .tableauPlaceholder {
+            margin-top: 20px;
+            border: 1px solid #ccc; /* Add a border around the Tableau viz */
+            border-radius: 8px; /* Rounded corners */
+            min-height: 600px; /* Ensure it has some default height */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <h1>Cleveland Cavaliers Fan Page</h1>
+            <p>A tribute to the Wine & Gold!</p>
+        </div>
+
+        <div class="navigation">
+            <a href="#">Back to Professional Pages</a> |
+            <a href="#tableau-graph">Jump to Stats Graph</a>
+            <div class='tableauPlaceholder' id='viz1744827526240' style='position: relative'><noscript><a href='#'><img alt=' ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Le&#47;LeBronsLegacyinCleveland&#47;LeBronsLegacy&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='LeBronsLegacyinCleveland&#47;LeBronsLegacy' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Le&#47;LeBronsLegacyinCleveland&#47;LeBronsLegacy&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1744827526240');                    var vizElement = divElement.getElementsByTagName('object')[0];                    if ( divElement.offsetWidth > 800 ) { vizElement.style.width='1300px';vizElement.style.height='2227px';} else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='1300px';vizElement.style.height='2227px';} else { vizElement.style.width='100%';vizElement.style.height='3327px';}                     var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+        </div>
+
+        <div class="content">
+            <h2>Welcome Cavs Fans!</h2>
+            <p>This page is dedicated to the Cleveland Cavaliers, a team with a rich history and passionate fanbase. From the Miracle of Richfield to the 2016 NBA Championship, the Cavs have provided countless memorable moments.</p>
+
+            <img src="/assets/Action.jpg"
+                 alt="Placeholder image of Cleveland Cavaliers action"
+                 onerror="this.onerror=null; this.src='https://placehold.co/600x300/cccccc/ffffff?text=Image+Not+Found';"
+                 class="main-image">
+            <h3>Key Moments & Eras:</h3>
+            <ol>
+                <li><strong>The Early Years & Miracle of Richfield (1970s):</strong> Establishing the franchise and the iconic playoff run.</li>
+                <li><strong>The Price/Daugherty/Nance Era (Late 80s/Early 90s):</strong> A period of consistent contention.</li>
+                <li>
+                    <strong>The LeBron James Era (Part 1 & 2):</strong>
+                    <ul>
+                        <li>First overall pick (2003)</li>
+                        <li>First NBA Finals appearance (2007)</li>
+                        <li>Return of LeBron (2014)</li>
+                        <li>NBA Championship (2016) - A historic comeback!</li>
+                    </ul>
+                </li>
+                <li><strong>The Post-LeBron Rebuild & Young Core (Present):</strong> Building for the future with exciting young talent like Darius Garland, Donovan Mitchell, and Evan Mobley.</li>
+            </ol>
+
+            <h3>2016 Championship Highlight:</h3>
+            <div class="video-container">
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/RBQ_oaUVNtc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+
+                </iframe>
+            </div>
+        </div>
+        <h1>
+            <a href="/pages/ai_page.html">NBA Player Guessing Game</a>
+        </h1>
+        <h3>
+            <a href="/Resume.html">Resume</a>
+        </h3>
+    </div>
+</body>
